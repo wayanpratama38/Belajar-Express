@@ -1,22 +1,13 @@
+import dotenv from 'dotenv'
 import Express from 'express';
-import { bookRouter } from './src/route.js';
+import { bookRouter } from './src/route/route.js';
 
+dotenv.config();
 const app = new Express();
-const port = 3000;
 app.use(Express.json());
 
 app.get("/",(req,res)=>{
     res.send("HELLO WORLD!");
-})
-
-app.get('/user/:id',(req,res)=>{
-    const {id} = req.params;
-    res.json({message : `User id is ${id}`});
-})
-
-app.get('/search',(req,res)=>{
-    const {keyword} = req.query;
-    res.json({message : `Keywoard is ${keyword}`});
 })
 
 app.use('/books',bookRouter);
@@ -37,6 +28,6 @@ app.use((err,req,res,next)=>{
     });
 })
 
-app.listen(port,()=>{
-    console.log(`Server listening on localhost:${port}`);
+app.listen(process.env.PORT,()=>{
+    console.log(`Server listening on localhost:${process.env.PORT}`);
 })
