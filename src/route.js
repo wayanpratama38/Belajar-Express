@@ -1,8 +1,11 @@
 import {Router} from 'express';
 import { books } from './book.js';
 import { nanoid } from 'nanoid';
+import { BookValidator } from './validator/validator.js';
+import { NotFound } from './exception/notFound.js';
 
 export const bookRouter = Router();
+const bookValidator = BookValidator
 
 bookRouter.get('/',(req,res)=>{
     // get books information
@@ -21,7 +24,9 @@ bookRouter.get('/',(req,res)=>{
 bookRouter.post('/',(req,res)=>{
     // judul, penulis, tahun
     const {title,author,year} = req.body;
-    
+    console.log(typeof year);
+    bookValidator.validatePostNewBookPayload({title,author,year});
+
     // create book id
     const id = `book-${nanoid(16)}`;
     
@@ -108,5 +113,8 @@ function createBook(id,title,author,year){
 
 function getBookIndex(bookId){
     const index= books.findIndex((book)=>book.id === bookId);
+    if(index === -1) {
+        throw new NotFound("Book isn't found");
+    }
     return index;
 }
