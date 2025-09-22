@@ -5,7 +5,9 @@ import { nanoid } from 'nanoid';
 export const bookRouter = Router();
 
 bookRouter.get('/',(req,res)=>{
+    // get books information
     const data = books;
+    
     res.json(
         {
             status : `success`,
@@ -19,9 +21,13 @@ bookRouter.get('/',(req,res)=>{
 bookRouter.post('/',(req,res)=>{
     // judul, penulis, tahun
     const {title,author,year} = req.body;
+    
     // create book id
-    const id = nanoid(`book-${nanoid(16)}`);
+    const id = `book-${nanoid(16)}`;
+    
+    // create new book object
     const newBook = createBook(id,title,author,year);
+    
     // push new book into array
     books.push(newBook);
     res.json({
@@ -34,13 +40,12 @@ bookRouter.get('/:id',(req,res)=>{
     // get id from params
     const {id} = req.params;
 
-    const indexedBook = books.map((book)=>{
-        if(book.id === id) {
-            return book
-        }
-    });
-    
-    console.log(`indexed book`,indexedBook);
+    // get book index
+    const index = getBookIndex(id);
+
+    // get indexed
+    const indexedBook = books[index];
+
     res.json({
         status : 'success',
         data : {
@@ -52,29 +57,38 @@ bookRouter.get('/:id',(req,res)=>{
 bookRouter.put('/:id',(req,res)=>{
     // get id from params
     const {id} = req.params;
+    
+    // get title,author and year from body
     const {title, author, year} = req.body;
+    
+    // get book index
     const bookIndex = getBookIndex(id);
 
-    console.log('Book index',bookIndex);
+    // replace old information into new information
     books[bookIndex] = {
         ...books[bookIndex],
         title : title,
         author : author,
         year : year
     };
-    return res.json({
+
+    res.json({
         status : `success`,
         message : `Book information successfully updated`
     })
 })
 
 bookRouter.delete('/:id',(req,res)=>{
+    // get id paramater
     const {id} = req.params;
 
+    // get the book index
     const bookIndex= getBookIndex(id);
 
+    // splice or delete selected index
     books.splice(bookIndex,1);
-    return res.json({
+
+    res.json({
         status : `success`,
         message : `Successfully deleted book with id : ${id}`
     });
@@ -88,14 +102,11 @@ function createBook(id,title,author,year){
         author: author,
         year : year
     }
+
     return newBook;
 }
 
 function getBookIndex(bookId){
-    const index= books.map((book)=>{
-        if(book.id === bookId){
-            return book
-        }
-    }).indexOf(bookId);
+    const index= books.findIndex((book)=>book.id === bookId);
     return index;
 }

@@ -4,6 +4,8 @@ import { bookRouter } from './src/route.js';
 const app = new Express();
 const port = 3000;
 
+app.use(Express.json());
+
 app.get("/",(req,res)=>{
     res.send("HELLO WORLD!");
 })
