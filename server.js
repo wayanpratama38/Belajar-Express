@@ -1,10 +1,12 @@
 import dotenv from 'dotenv'
 import Express from 'express';
 import { bookRouter } from './src/route/route.js';
+import { loggerMiddleware } from './src/middleware/loggerMiddleware.js';
 
 dotenv.config();
 const app = new Express();
 app.use(Express.json());
+app.use(loggerMiddleware);
 
 app.get("/",(req,res)=>{
     res.send("HELLO WORLD!");
