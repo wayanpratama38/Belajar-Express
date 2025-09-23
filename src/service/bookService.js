@@ -1,7 +1,6 @@
 import { nanoid } from "nanoid";
-import { books } from "../model/book.js";
-import { NotFound } from "../exception/notFound.js";
 import { Pool } from "pg";
+import { NotFound } from "../exception/notFound";
 
 export default class BookService {
     _pool;
@@ -33,7 +32,7 @@ export default class BookService {
         
         const result = (await this._pool.query(query));
         if(result.rowCount===0){
-            return [];
+            throw new NotFound("Book not found");
         }
         return result.rows[0];
     }
