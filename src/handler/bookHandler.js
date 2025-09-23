@@ -17,8 +17,8 @@ export default class BookHandler{
     }
 
     //GET/books
-    getAllBooksHandler(req,res){
-        const data = this._service.getAllBooksService();
+    async getAllBooksHandler(req,res){
+        const data = await this._service.getAllBooksService();
         res.json(
             {
                 status : `success`,
@@ -28,9 +28,9 @@ export default class BookHandler{
     }
 
     // GET/books/:id
-    getBookByIdHandler(req,res){
+    async getBookByIdHandler(req,res){
         const { id } = req.params;
-        const result = this._service.getBookByIdService(id);
+        const result = await this._service.getBookByIdService(id);
         res.json({
             status: 'success',
             data : result
@@ -38,23 +38,23 @@ export default class BookHandler{
     }
 
     // POST/books
-    postNewBookHandler(req,res){
+    async postNewBookHandler(req,res){
         const {title,author,year} = req.body;
         this._validator.validatePostNewBookPayload({title,author,year});
-        this._service.postNewBookService(title,author,year);
+        const result = await this._service.postNewBookService(title,author,year);
         
         res.json({
             status : 'success',
-            message : 'Successfully add new book'
+            message : `Successfully add new book with id : ${result} `
         })
     }
 
     // PUT/books/:id
-    putBookHandler(req,res){
+    async putBookHandler(req,res){
         const { id } = req.params
         const {title,year,author} = req.body;
         this._validator.validatePostNewBookPayload({title,author,year})
-        this._service.putBookService(id,title,author,year);
+        await this._service.putBookService(id,title,author,year);
         res.json({
             status : `success`,
             message : `Book information successfully updated`
@@ -62,9 +62,9 @@ export default class BookHandler{
     }
 
     // DELETE/books/:id
-    deleteBookHandler(req,res){
+    async deleteBookHandler(req,res){
         const { id } = req.params;
-        this._service.deleteBookService(id);
+        await this._service.deleteBookService(id);
         res.json({
             status : `success`,
             message : `Successfully deleted book with id : ${id}`

@@ -1,63 +1,79 @@
 import { nanoid } from "nanoid";
 import { books } from "../model/book.js";
 import { NotFound } from "../exception/notFound.js";
+import { Pool } from "pg";
 
 export default class BookService {
-    // GET/books
-    getAllBooksService() {
-        const data = books;
-        return data;
+    _pool;
+
+    constructor(){
+        this._pool = new Pool();
     }
 
-    // GET/books/:id
-    getBookByIdService(id){
-        const index = this.getBookIndex(id);
-        const result = books[index];
+
+    // GET/books
+    async getAllBooksService() {
+        const query = {
+            text : `
+                SELECT * FROM books;
+            `
+        }
+        const result = (await this._pool.query(query)).rows;
         return result;
     }
 
+    // GET/books/:id
+    async getBookByIdService(id){
+        const query = {
+            text : `
+                SELECT * FROM books WHERE id = $1
+            `,
+            values : [id]
+        }
+        
+        const result = (await this._pool.query(query));
+        if(result.rowCount===0){
+            return [];
+        }
+        return result.rows[0];
+    }
+
     // POST/books
-    postNewBookService(title,author,year){
+    async postNewBookService(title,author,year){
         const id = `book-${nanoid(16)}`
-        const newBook = this.createBook(id,title,author,year)
-        books.push(newBook);
-        return newBook;
+        const query = {
+            text : `
+                INSERT INTO books
+                VALUES($1,$2,$3,$4)
+                RETURNING id
+            `,
+            values : [id,title,author,year]
+        }
+        const result = (await this._pool.query(query)).rows[0].id;
+        return result;
     }
 
     // PUT/books/:id
-    putBookService(id,title,author,year){
-        const bookIndex = this.getBookIndex(id);
-
-        books[bookIndex] = {
-            ...books[bookIndex],
-            title : title,
-            author : author,
-            year : year
+    async putBookService(id,title,author,year){
+        const query = {
+            text : `
+                UPDATE books
+                SET title=$1, author=$2, year=$3
+                WHERE id=$4
+            `,
+            values : [title,author,year,id]
         }
+        await this._pool.query(query);
     }
 
     // DELETE/books/:id
-    deleteBookService(id){
-        const bookIndex = this.getBookIndex(id);
-        books.splice(bookIndex,1);
-    }
-    
-    createBook(id,title,author,year){
-        const newBook = {
-            id : id,
-            title :title,
-            author: author,
-            year : year
-        }
-    
-        return newBook;
-    }
-    
-    getBookIndex(bookId){
-        const index= books.findIndex((book)=>book.id === bookId);
-        if(index === -1) {
-            throw new NotFound("Book isn't found");
-        }
-        return index;
+    async deleteBookService(id){
+        const query = {
+            text : `
+                DELETE FROM books WHERE id = $1
+            `,
+            values : [id]
+        };
+        await this._pool.query(query);
     }
 }
