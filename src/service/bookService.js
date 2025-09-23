@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { Pool } from "pg";
-import { NotFound } from "../exception/notFound";
+import { NotFound } from "../exception/notFound.js";
 
 export default class BookService {
     _pool;

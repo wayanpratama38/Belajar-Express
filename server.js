@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import Express from 'express';
 import { bookRouter } from './src/route/route.js';
 import { loggerMiddleware } from './src/middleware/loggerMiddleware.js';
+import { userRouter } from './src/route/userRoute.js';
 
 dotenv.config();
 const app = new Express();
@@ -13,6 +14,7 @@ app.get("/",(req,res)=>{
 })
 
 app.use('/books',bookRouter);
+app.use('/users',userRouter)
 
 // middleware for not found route
 app.use((req,res)=>{
